@@ -8,9 +8,7 @@ import models
 
 class BaseModel():
     """This class defines all common attributes/methods for other classes"""
-
-
-    __ids_set = {}
+    
 
     def __init__(self, *args, **kargs):
         """Initialises the classe with the following attribs :

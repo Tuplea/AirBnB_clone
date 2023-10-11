@@ -1,4 +1,4 @@
-##!/usr/bin/python3
+#!/usr/bin/python3
 """FileStorage class that handles file serialization/deserialisation"""
 import json
 from models.base_model import BaseModel
