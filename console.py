@@ -3,6 +3,12 @@
 import cmd
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
@@ -20,7 +26,7 @@ class HBNBCommand(cmd.Cmd):
     
     def do_create(self, line):
         """creates a new instance of the class called
-        Usage : create <class name>"""
+    Usage : create <class name>"""
         if len(line.split( )) > 1:
             print("Usage : create <class name>")
         elif len(line) < 1:
@@ -35,7 +41,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, line):
         """Shows more info about an instance
-        Usage : show <class name> <id>"""
+    Usage : show <class name> <id>"""
+        storage = FileStorage.all(FileStorage)
         if len(line.split( )) > 2:
             print("Usage : show <class name> <id>")
         elif len(line) < 1:
@@ -46,13 +53,13 @@ class HBNBCommand(cmd.Cmd):
             try:
                 class_name = line.split(" ")[0]
                 id = line.split(" ")[1]
-                print(str(FileStorage.all(FileStorage)[class_name + "." + id]))
+                print(str(storage[class_name + "." + id]))
             except KeyError:
                 print("** no instance found **")
 
     def do_destroy(self, line):
         """deletes an instance by id
-        Usage : delete <class name> <id>"""
+    Usage : delete <class name> <id>"""
         if len(line.split( )) > 2:
             print("Usage : show <class name> <id>")
         elif len(line) < 1:
@@ -70,10 +77,9 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, line):
         """prints all the str repr of stored model
-        Usage 1 : all
-        And can also specify the ClassName to print all instances
-        of that class
-        Usage 2 : all <class name>"""
+    Usage 1 : all
+And can also specify the <class name> to print all instances of that class
+    Usage 2 : all <class name>"""
         if len(line.split( )) > 2:
             print("Usage 1 : all <class name>\nUsage 2 : all")
         elif len(line) < 1:
@@ -84,45 +90,88 @@ class HBNBCommand(cmd.Cmd):
             print(objs_str_list)
         elif len(line.split(" ")) < 2:
             #ClassName arg is given
-            for key in FileStorage.all(FileStorage).keys():
-                if key.split('.')[0] == line.split(' ')[0]:
-                    print(str(FileStorage.all(FileStorage)[key]))
-                else:
-                    print("** class doesn't exist **")
+            if len(FileStorage.all(FileStorage).keys()):
+                for key in FileStorage.all(FileStorage).keys():
+                    if len(FileStorage.all(FileStorage).keys()) == 0:
+                        print("** class doesn't exist **")
+                    if key.split('.')[0] == line.split(' ')[0]:
+                        print(str(FileStorage.all(FileStorage)[key]))
+                    else:
+                        print("** class doesn't exist **")
+            else:
+                print("** class doesn't exist **")
 
     def do_update(self, line):
-        #   TO DO : A string argument with a space must be between double quote
-                #   Finish the switch/match case satatement
         """Updates an instance based on the class name and id by 
-        adding or updating attribute
-        Usage: update <class name> <id> <attribute name> \"<attribute value>\""""
-        if len(line.split( )) != 4:
-            match len(line.split( )):
-                case 0:
-                    pass
-                case 1:
-                    pass
-                case 2:
-                    pass
-                case 3:
-                    pass
-            if len(line.split( )) > 4:
-                print("Usage: update <class name> <id> "
-                      "<attribute name> \"<attribute value>\"")
+adding or updating attribute
+    Usage: update <class name> <id> <attribute name> \"<attribute value>\""""
+        storage = FileStorage.all(FileStorage)
+        if len(line.split( )) < 4:
+            if len(line.split( )) == 0:
+                print("** class name missing **")
+            elif len(line.split( )) == 1:
+                print("** instance id missing **")
+            elif len(line.split( )) == 2:
+                print("** attribute name missing **")
+            elif len(line.split( )) == 3:
+                print("** value missing **")
         else:
             try:
+                for key in storage.keys():
+                    if (key.split('.')[0] == line.split(' ')[0]):
+                        #class name exists
+                        pass
+                    else:
+                        print("** class doesn't exist **")
                 class_name = line.split(" ")[0]
                 id = line.split(" ")[1]
                 attrib_name = line.split(" ")[2]
-                attrib_value = line.split(" ")[3]
-                obj = FileStorage.all(FileStorage)[class_name + "." + id]
+                attrib_value = eval(line.split(" ")[3])
+                obj = storage[class_name + "." + id]
                 obj.__dict__[attrib_name] = attrib_value
-                print("@"*10)
-                print(obj.__dict__)
-                print("@"*10)
+                if attrib_name == "id":
+                    #changing the id is storage file
+                    old_key = class_name + "." + id
+                    new_key = class_name + "." + attrib_value
+                    storage[new_key] = storage[old_key]
+                    del storage[old_key]
                 obj.save()
             except KeyError:
                 print("** no instance found **")
+
+    def default(self, line):
+        """handles <class name>.<function> calls"""
+
+        if self.line_to_cmd(line):
+            #change print to eval
+            try:
+                eval("self.do_" + self.line_to_cmd(line)[1] + "(" + "\"" 
+                    + self.line_to_cmd(line)[0] + " " 
+                    + self.line_to_cmd(line)[2] + "\"" + ")")
+            except AttributeError:
+                super().default(line)
+            except NameError:
+                super().default(line)
+            except SyntaxError:
+                super().default(line)
+        else:
+            super().default(line)
+
+    @staticmethod
+    def line_to_cmd(line):
+        """processes the ClassName.Command(Arg) format calls
+returns False if something went south"""
+        #ex : User.create()     User.show("aabbvv")
+        if "." in line and "(" in line and ")" in line:
+            try:
+                cls_name = line.split(".")[0]
+                funct = line.split(".")[1].split("(")[0]
+                arg = line.split(".")[1].split("(")[1].split(")")[0]
+                return [cls_name, funct, arg]
+            except IndexError:
+                return False
+        else:
+            return False
         
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
