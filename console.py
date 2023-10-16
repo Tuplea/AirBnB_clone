@@ -92,6 +92,8 @@ And can also specify the <class name> to print all instances of that class
             for key in FileStorage.all(FileStorage).keys():
                 objs_str_list.append(str(FileStorage.all(FileStorage)[key]))
             print(objs_str_list)
+        #elif line.split(" ")[0] not in FileStorage.all(FileStorage):
+            #print("** class doesn't exist **")
         elif len(line.split(" ")) < 2:
             # ClassName arg is given
             if len(FileStorage.all(FileStorage).keys()):
@@ -119,6 +121,8 @@ adding or updating attribute
                 print("** attribute name missing **")
             elif len(line.split()) == 3:
                 print("** value missing **")
+        elif line.split(" ")[0] not in FileStorage.all(FileStorage):
+            print("** class doesn't exist **")
         else:
             try:
                 for key in storage.keys():
