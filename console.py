@@ -17,7 +17,7 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
 
     def do_quit(self, line):
-        """Quit command to exit the program"""
+        """Quits the command prompt"""
         return True
 
     def do_EOF(self, line):
@@ -60,8 +60,10 @@ class HBNBCommand(cmd.Cmd):
     def do_destroy(self, line):
         """deletes an instance by id
     Usage : delete <class name> <id>"""
-        if len(line.split()) > 2:
-            print("Usage : show <class name> <id>")
+        if 0 :
+            #len(line.split()) > 2:
+            #print("Usage : show <class name> <id>")
+            pass
         elif len(line) < 1:
             print("** class name missing **")
         elif len(line.split(" ")) < 2:
