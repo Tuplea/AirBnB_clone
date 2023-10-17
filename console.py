@@ -71,7 +71,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
         elif len(line.split(" ")) < 2:
             print("** instance id missing **")
-        elif line.split(" ")[0] not in FileStorage.all(FileStorage):
+        elif line.split(" ")[0] not in self.allowed_classes:
             print("** class doesn't exist **")
         else:
             class_name = line.split(" ")[0]
