@@ -63,9 +63,9 @@ class HBNBCommand(cmd.Cmd):
     def do_destroy(self, line):
         """deletes an instance by id
     Usage : delete <class name> <id>"""
-        if 0 :
-            #len(line.split()) > 2:
-            #print("Usage : show <class name> <id>")
+        if 0:
+            # len(line.split()) > 2:
+            # print("Usage : show <class name> <id>")
             pass
         elif len(line) < 1:
             print("** class name missing **")
@@ -95,8 +95,8 @@ And can also specify the <class name> to print all instances of that class
             for key in FileStorage.all(FileStorage).keys():
                 objs_str_list.append(str(FileStorage.all(FileStorage)[key]))
             print(objs_str_list)
-        #elif line.split(" ")[0] not in FileStorage.all(FileStorage):
-            #print("** class doesn't exist **")
+        # elif line.split(" ")[0] not in FileStorage.all(FileStorage):
+            # print("** class doesn't exist **")
         elif len(line.split(" ")) < 2:
             # ClassName arg is given
             if len(FileStorage.all(FileStorage).keys()):
@@ -149,6 +149,7 @@ adding or updating attribute
                 obj.save()
             except KeyError:
                 print("** no instance found **")
+
     def get_objects(self, instance=''):
         """Gets the elements stored in memory"""
         objects = FileStorage.all(FileStorage)
