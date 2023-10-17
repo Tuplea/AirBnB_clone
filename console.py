@@ -9,12 +9,15 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
+import re
 
 
 class HBNBCommand(cmd.Cmd):
     """the entry point of the command interpreter"""
 
     prompt = "(hbnb) "
+    allowed_classes = ['BaseModel', 'User', 'State', 'City',
+                       'Amenity', 'Place', 'Review']
 
     def do_quit(self, line):
         """Quits the command prompt"""
@@ -146,8 +149,42 @@ adding or updating attribute
                 obj.save()
             except KeyError:
                 print("** no instance found **")
+    def get_objects(self, instance=''):
+        """Gets the elements stored in memory"""
+        objects = FileStorage.all(FileStorage)
+
+        if instance:
+            keys = objects.keys()
+            return [str(val) for key, val in objects.items()
+                    if key.startswith(instance)]
+
+        return [str(val) for key, val in objects.items()]
 
     def default(self, line):
+        """defaul value handler"""
+        if '.' in line:
+            splitted_line = re.split(r'\.|\(|\)', line)
+            class_name = splitted_line[0]
+            method_name = splitted_line[1]
+
+            if class_name in self.allowed_classes:
+                if method_name == 'all':
+                    print(self.get_objects(class_name))
+                elif method_name == 'count':
+                    print(len(self.get_objects(class_name)))
+                elif method_name == 'show':
+                    class_id = splitted_line[2][1:-1]
+                    self.do_show(class_name + ' ' + class_id)
+                elif method_name == 'destroy':
+                    class_id = splitted_line[2][1:-1]
+                    self.do_destroy(class_name + ' ' + class_id)
+                else:
+                    super().default(line)
+
+            else:
+                print("** class doesn't exist **")
+
+    def defaulti_old(self, line):
         """handles <class name>.<function> calls"""
 
         if self.line_to_cmd(line):
